@@ -10,7 +10,7 @@ Download Instructions:
 
 No download is required. The project is hosted live on the web.
 
-Live Link: https: https://meek-cat-7d2d33.netlify.app/
+Live Link: pertchartgame.netlify.app
 
 Running the Game:
 
