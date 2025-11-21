@@ -65,18 +65,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    //ANADAS WORK START - basic structure
+    //ANADAS WORK START
     class UIController
     {
         constructor()
         {
     
-            //ANADAS WORK START
+          
             this.checkButton = document.getElementById('check-btn');
             this.graphContainer = document.getElementById('graph-container');
-            //ANADAS WORK END
+           
 
-            //ANADAS WORK START
+            
             this.soundManager = new SoundManager();
             this.animationManager = new AnimationManager(this.soundManager);
             this.graphRenderer = new GraphRenderer(this.graphContainer);
@@ -231,16 +231,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.warn('Answer key lookup failed', e);
             }
             
-            //ANADAS WORK START - validation logic
+      
             //track grading stats
             let allCorrect=true;
             let correctCount=0;
             let blankCount=0;
             let totalTasks=0;
 
-            //ANADAS WORK START
+      
             const fieldsToCkeck=['es','ef','ls','lf','slack'];
-            //ANADAS WORK END
+   
             for (const taskId in correctAnswers)
             {
                 totalTasks++;
@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!taskCorrect) allCorrect=false;
             }
             
-            //ANADAS WORK START - success handling
+            
             if (allCorrect)
             {
                 console.log("All answers correct! Playing animation.");
@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.soundManager.playSound('success_chime');
                 //ANADAS WORK END
             }
-            //ANADAS WORK END
+           
             else
             {
                 //play mario fall sound for wrong answers
@@ -360,9 +360,9 @@ document.addEventListener('DOMContentLoaded', () => {
             this.isTryMode=true;
             this.checkButton.textContent='Try Again';
         }
-        //ANADAS WORK END
+    
     }
-    //ANADAS WORK END
+ 
 
     (async () => {
         await loadCSVAnswerKey();

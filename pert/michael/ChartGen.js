@@ -38,97 +38,134 @@
 		[5,12,10,8,7,2,4]   //set 10
 	];
 
-	//creates a pert chart with specific layout pattern and duration set
+	//main chart generator takes optional layout 1 to 8 and set 1 to 10
+	//omit both for full random or pass specific indices for reproducible charts
 	function generateLayout(layoutIndex, setIndex)
 	{
-		//pick which of the 10 duration sets to use
-		let chosenSet=undefined;
-		try
+		//decide which of the 10 preset duration arrays to use
+		let chosenSet;
+		
+		//check if caller passed explicit set index between 1 and 10
+		if(typeof setIndex==='number' && setIndex>=1 && setIndex<=10)
 		{
-				//use provided set number or check url params or pick random
-				if(typeof setIndex==='number' && setIndex>=1 && setIndex<=10)
-				{
-					chosenSet=setIndex-1;
-				}
-				else
-				{
-					const params=new URLSearchParams(location.search);
-					const s=parseInt(params.get('set')||params.get('data')||'',10);
-					if(!isNaN(s) && s>=1 && s<=10)
-					{
-						chosenSet=s-1;
-					}
-					else
-					{
-						chosenSet=randInt(0,9);
-					}
-				}
+			//convert 1 based to 0 based array index
+			chosenSet=setIndex-1;
+		}
+		else
+		{
+			//no valid setindex provided so check url query params
+			//allows linking to specific quiz like game.html?set=3
+			const params=new URLSearchParams(location.search);
+			const s=parseInt(params.get('set')||params.get('data')||'',10);
+			
+			//validate url param is in range 1 to 10
+			if(!isNaN(s) && s>=1 && s<=10)
+			{
+				chosenSet=s-1;
 			}
-			catch(e)
-		{
-			//fallback to random preset if error
-			chosenSet=randInt(0,9);
+			else
+			{
+				//no valid param either so pick random from 0 to 9
+				chosenSet=randInt(0,9);
+			}
 		}
 
-		//pick layout pattern classic diamond parallel etc
+		//pick which layout pattern to use classic diamond parallel etc
+		//if layoutindex passed and valid use it otherwise random
 		const idx=(typeof layoutIndex==='number'&&layoutIndex>=1&&layoutIndex<=layouts.length)?layoutIndex-1:randInt(0,layouts.length-1);
 
+		//get the selected layout object from array
 		const layout=layouts[idx];
 
+		//always 7 nodes labeled a through g
 		const nodes=['A','B','C','D','E','F','G'];
 
-		//build task objects with durations and positions
+		//empty object will hold all task data
 		const tasks={};
 
+		//loop through each node letter and build its task object
 		for(const n of nodes)
 		{
-			//get duration from the preset data set
+			//grab the chosen duration array
 			const map=presetSets[chosenSet];
+			
+			//find position of current letter in alphabet string
 			const nodeIndex='ABCDEFG'.indexOf(n);
+			
+			//pull duration from preset array at that position
+			//fallback to random 1 to 12 if somehow index invalid
 			const len=(nodeIndex>=0 && map[nodeIndex]!=null) ? Number(map[nodeIndex]) : randInt(1,12);
 
+			//get xy position from layout object or default to center
 			const pos=layout.positions[n]||['50%','160px'];
 
+			//build full task object with all properties
+			//slice pred array to avoid shared references
+			//succ starts empty will populate next
 			tasks[n]={id:n,len:len,pred:(layout.preds[n]||[]).slice(),succ:[],x:pos[0],y:pos[1]};
 		}
 
-		//limit each task to max 2 outgoing arrows to keep diagram clean
+		//now build successor lists and enforce max 2 outgoing arrows per node
+		//this keeps diagrams readable prevents too many crossing lines
 		const succCount={};
 
+		//initialize all counts to zero
 		for(const n of nodes)
 		{
 			succCount[n]=0;
 		}
 
+		//loop through and populate succ arrays while counting
 		for(const n of nodes)
 		{
+			//get predecessor list for current task
 			const preds=tasks[n].pred;
+			
+			//will hold filtered list excluding any that exceed limit
 			const filteredPreds=[];
 
+			//check each predecessor
 			for(const p of preds)
 			{
+				//verify predecessor task actually exists
 				if(tasks[p])
 				{
+					//only add if predecessor has less than 2 successors already
 					if(succCount[p]<2)
 					{
+						//add current task to predecessor successor list
 						tasks[p].succ.push(n);
+						
+						//increment successor count for that predecessor
 						succCount[p]++;
+						
+						//keep this predecessor in filtered list
 						filteredPreds.push(p);
 					}
+					//if succcount already 2 this pred gets dropped
+					//breaks the dependency to keep diagram clean
 				}
 			}
 
+			//replace original pred list with filtered version
+			//removes any preds that were over limit
 			tasks[n].pred=filteredPreds;
 		}
 
-		//create compact string like a4b8c2 for matching answer keys
+		//build compact identifier string for answer key matching
+		//format is like a4b8c2d1e5f6g10 lowercase letter plus duration
 		let compact='';
 
 		for(const n of nodes)
 		{
+			//concatenate lowercase letter and its duration
 			compact+=n.toLowerCase()+tasks[n].len;
 		}
 
+		//return object with everything caller needs
+		//tasks is main data compact for matching layoutindex and setindex for logging
+		//layoutname is string like classic or diamond
+		//convert indices back to 1 based for return
 		return{tasks,compact,layoutIndex:idx+1,layoutName:layout.name,setIndex:chosenSet+1};
 	}
 

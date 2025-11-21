@@ -89,7 +89,7 @@ class SteppedArrowRenderer extends ArrowRenderer
     }
 }
 
-//ANADAS WORK START
+
 class GraphRenderer
 {
     constructor(graphContainer)
@@ -117,7 +117,7 @@ class GraphRenderer
             }, 100);
         });
     }
-    //ANADAS WORK END
+
 
     //polymorphism step 2 factory method selects which concrete renderer to instantiate
     //returns object of type curvedarrowrenderer straightarrowrenderer or steppedarrowrenderer
@@ -132,7 +132,7 @@ class GraphRenderer
         return new CurvedArrowRenderer();
     }
 
-    //ANADAS WORK START
+
     drawEmptyQuiz(tasks)
     {
         this.container.innerHTML='';
@@ -155,7 +155,7 @@ class GraphRenderer
 
         this.container.appendChild(svg);
 
-        //ANADAS WORK START - create nodes
+
         for (const taskId in tasks)
         {
             const task = tasks[taskId];
@@ -176,8 +176,6 @@ class GraphRenderer
             `;
             this.container.appendChild(nodeElement);
         }
-        //ANADAS WORK END
-
         //iterative physics simulation pushes overlapping nodes apart
         this.relaxNodePositions();
 
@@ -220,10 +218,9 @@ class GraphRenderer
                 lines.push(`${t.id}     ${t.len}    ${preds}`);
             }
             table.innerHTML = '<pre>' + lines.join('\n') + '</pre>';
-        }
-        //ANADAS WORK END
+        }//AANADAS WORK END
     }
-    //ANADAS WORK END
+  
 
     //redraws all arrows after window resize or layout change
     //demonstrates polymorphism arrows redrawn with same renderer strategy
@@ -306,9 +303,9 @@ class GraphRenderer
             input.classList.remove('correct', 'wrong');
         });
     }
-    //ANADAS WORK END
 
-    //ANADAS WORK START
+
+    
     //iterative collision detection and resolution algorithm
     //uses simplified physics simulation to separate overlapping nodes
     relaxNodePositions()
@@ -411,11 +408,9 @@ class GraphRenderer
             if (!moved) break;
         }
     }
-    //ANADAS WORK END
+  
 }
-//ANADAS WORK END
 
-//ANADAS WORK START
 class AnimationManager
 {
     constructor(soundManager)
@@ -438,7 +433,7 @@ class AnimationManager
         }
     }
 }
-//ANADAS WORK END
+
 
 //ANADAS WORK START
 class SoundManager
