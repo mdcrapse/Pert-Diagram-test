@@ -8,7 +8,7 @@ also stores 10 preset duration sets so every chart is reproducible. you call gen
 
 **how generateLayout works**
 
-takes optional layoutindex 1 to 8 and setindex 1 to 10. omit both for full random. first it picks which duration set to use by checking passed setindex then url params like game.html?set=3 then falls back to random. next picks layout pattern same way with layoutindex. loops through nodes a to g and builds task objects with id duration predecessors successors and xy position. durations come from the chosen preset array. positions come from layout object
+takes optional layoutindex 1 to 8 and setindex 1 to 10. first it picks which duration set to use by checking passed setindex then url params like game.html?set=3 then falls back to random. next picks layout pattern same way with layoutindex. loops through nodes a to g and builds task objects with id duration predecessors successors and xy position. durations come from the chosen preset array. positions come from layout object
 
 **successor limiting**
 
@@ -60,9 +60,7 @@ super simple just button handlers. start button goes to game page. easy hard but
 
 ```
 chartgen creates data → main.js uicontroller stores it → 
-graphrenderer draws it → user fills inputs → 
-uicontroller grades against csv answers → 
-animationmanager shows results
+graphrenderer draws it → user fills inputs → uicontroller grades against csv answers → animationmanager shows results
 ```
 
 key connection points window.generatelayout exposed globally by chartgen. window.lastgeneratedlayout stores current chart data. window.michaelanswer key stores csv answers. main.js creates instances of graphrenderer animationmanager soundmanager and coordinates them
