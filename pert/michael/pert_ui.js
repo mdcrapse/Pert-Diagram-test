@@ -123,13 +123,39 @@ class GraphRenderer
     //returns object of type curvedarrowrenderer straightarrowrenderer or steppedarrowrenderer
     //all three inherit from arrowrenderer base class and override draw method
     //caller stores returned object in this.arrowrenderer without knowing exact type
+    //this method is now just default fallback real selection happens per arrow
     selectArrowRenderer()
     {
-        //runtime decision point for strategy pattern
-        //could add logic here to choose different renderers based on user preference or screen size
-        console.log('arrow renderer curved bezier selected');
-        //instantiate concrete implementation and return as base type reference
+        //default to curved but each arrow picks its own based on duration difference
+        console.log('arrow renderer using dynamic selection based on task duration');
         return new CurvedArrowRenderer();
+    }
+    
+    //selects arrow renderer based on duration difference between tasks
+    //straight for same duration curved for 1 or 2 difference stepped for 3 or more
+    selectArrowRendererForPair(fromTask, toTask)
+    {
+        //get duration values from tasks
+        const fromDuration=fromTask.len;
+        const toDuration=toTask.len;
+        
+        //calculate absolute difference
+        const diff=Math.abs(fromDuration-toDuration);
+        
+        //same duration use straight arrow shows equal weight
+        if (diff===0) 
+            {
+            return new StraightArrowRenderer();
+        }
+        //small difference 1 or 2 units use curved arrow smooth transition
+        else if (diff=== 1||diff===2) 
+        {
+            return new CurvedArrowRenderer();
+        }
+        //large difference 3 or more use stepped arrow shows big jump
+        else {
+            return new SteppedArrowRenderer();
+        }
     }
 
 
@@ -197,13 +223,19 @@ class GraphRenderer
                 const fromEl = document.getElementById(`task-${pred}`);
                 if (!fromEl) continue;
                 
+                //get predecessor task object to compare durations
+                const fromTask = tasks[pred];
+                
+                //select appropriate arrow renderer based on duration difference
+                //straight if same curved if diff 1 or 2 stepped if diff 3 plus
+                const renderer = this.selectArrowRendererForPair(fromTask, task);
+                
                 //polymorphic method call this is where dynamic dispatch happens
                 //javascript runtime looks up which draw method to call based on actual object type
-                //if arrowrenderer holds curvedarrowrenderer calls curvedarrowrenderer.draw
-                //if arrowrenderer holds straightarrowrenderer calls straightarrowrenderer.draw
+                //now each arrow can use different renderer based on task relationship
                 //method signature is identical but implementation differs
                 //this is runtime polymorphism aka late binding aka dynamic dispatch
-                this.arrowRenderer.draw(svg, fromEl, toEl, parentRect);
+                renderer.draw(svg, fromEl, toEl, parentRect);
             }
         }
 
@@ -248,11 +280,16 @@ class GraphRenderer
                 const fromEl = document.getElementById(`task-${pred}`);
                 if (!fromEl) continue;
                 
+                //get predecessor task to compare durations
+                const fromTask = tasks[pred];
+                
+                //select renderer based on duration difference
+                const renderer = this.selectArrowRendererForPair(fromTask, task);
+                
                 //another polymorphic call to draw method
-                //same renderer instance used consistently across all arrows
-                //ensures visual consistency all arrows use same style
-                //demonstrates benefit of strategy pattern one place to change rendering style
-                this.arrowRenderer.draw(svg, fromEl, toEl, parentRect);
+                //each arrow picks its own style based on task relationship
+                //demonstrates benefit of strategy pattern runtime selection per arrow
+                renderer.draw(svg, fromEl, toEl, parentRect);
             }
         }
     }
