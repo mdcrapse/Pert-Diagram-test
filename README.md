@@ -10,7 +10,12 @@ Download Instructions:
 
 No download is required. The project is hosted live on the web.
 
-Live Link: pertchartgame.netlify.app
+Live Link: [pertchartgame.netlify.app](https://pertchartgame.netlify.app/)
+
+Building a local version of the game:
+ * Setup a localhost web server.
+ * Make sure the files are organized like: http-root/Pert/Pert-Diagram-test
+ * Open the index.html file in your web browser.
 
 Running the Game:
 
